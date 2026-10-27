@@ -1,6 +1,6 @@
 __pycache__/
 *.zip
-*.pt
+
 merged_arrow/
 runs/
 hamsterAdmin-main/
@@ -10,3 +10,4 @@ hamssterboy3.py
 hamsstergymEnv.py
 hamsstergymTra.py
 cameraTest.py
+trainArrow.py
