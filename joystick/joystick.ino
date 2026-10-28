@@ -1,24 +1,22 @@
 const int pinX = A1; //A1과 VRy 연결
 const int pinY = A0;
 
-const int centerX = 505;
-const int centerY = 497;
-const int deadzone = 10;
+const int centerX = 500;
+const int centerY = 500;
+const int deadzone = 30;
 
 const int scale = 80;
 
-SoftwareSerial BTSerial(2,3);
-
 void setup() {
-  BTSerial.begin(9600);
+  Serial.begin(9600);
 }
 
 void loop() {
   int valX = analogRead(pinX);
   int valY = analogRead(pinY);
 
-  BTSerial.print(valX);
-  BTserial.println(valY);
+  Serial.print(valX);
+  Serial.println(valY);
 
   int dx = valX - centerX;
   int dy = valY - centerY;
@@ -38,9 +36,9 @@ void loop() {
   int right = (int)(r/m*scale);
 
 
-  BTSerial.print(left);
-  BTSerial.print(" | ");
-  BTSerial.println(right);
+  Serial.print(left);
+  Serial.print(" | ");
+  Serial.println(right);
 
   delay(1000);
 }
