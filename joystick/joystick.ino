@@ -15,9 +15,6 @@ void loop() {
   int valX = analogRead(pinX);
   int valY = analogRead(pinY);
 
-  Serial.print(valX);
-  Serial.println(valY);
-
   int dx = valX - centerX;
   int dy = valY - centerY;
 
