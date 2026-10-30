@@ -3,31 +3,38 @@ local function is_blue_pixel(r, g, b)
     return b > 0.4 and b > (r + 0.15) and b > (g + 0.15)
 end
 
--- 1. 연속된 파란색 픽셀 구간을 기준으로 영역을 찾아 크롭하는 그리드 생성 함수
+-- 1. 연속된 파란색 픽셀 구간을 기준으로 영역을 찾아 크롭하는 그리드 생성 함수 (좌우 100px 제외)
 local function get_sign_block_grid(source_img_data, block_size, threshold_ratio)
     local width, height = source_img_data:getDimensions()
-    
-    -- 전체 이미지에서 파란색 픽셀 이진 그리드 생성
+   
+    -- 전체 이미지에서 파란색 픽셀 이진 그리드 생성 (좌우 100픽셀 제외)
     local raw_grid = {}
     local found_pixels = 0
+    local crop_margin_x = 100 -- 좌우로 잘라낼 픽셀 수
+
     for y = 0, height - 1 do
         local row = {}
         for x = 0, width - 1 do
-            local r, g, b, _ = source_img_data:getPixel(x, y)
-            if is_blue_pixel(r, g, b) then
-                row[x + 1] = 1
-                found_pixels = found_pixels + 1
-            else
+            -- 좌우 양끝 100픽셀 범위는 연산에서 제외 (0으로 처리)[cite: 2]
+            if x < crop_margin_x or x >= width - crop_margin_x then
                 row[x + 1] = 0
+            else
+                local r, g, b, _ = source_img_data:getPixel(x, y)
+                if is_blue_pixel(r, g, b) then
+                    row[x + 1] = 1
+                    found_pixels = found_pixels + 1
+                else
+                    row[x + 1] = 0
+                end
             end
         end
         raw_grid[y + 1] = row
     end
 
-    -- 노이즈 필터: 전체 파란 픽셀 수가 너무 적으면 무시
+    -- 노이즈 필터: 전체 파란 픽셀 수가 너무 적으면 무시[cite: 2]
     if found_pixels < 80 then return nil, "Too few blue pixels" end
 
-    -- [조건 1] 가로(너비) 방향으로 연속된 파란색 픽셀이 가장 긴 구간 탐색
+    -- [조건 1] 가로(너비) 방향으로 연속된 파란색 픽셀이 가장 긴 구간 탐색[cite: 2]
     local max_run_w = 0
     local best_x1, best_x2 = 1, width
     for y = 1, height do
@@ -53,7 +60,7 @@ local function get_sign_block_grid(source_img_data, block_size, threshold_ratio)
         end
     end
 
-    -- [조건 2] 세로(폭) 방향으로 연속된 파란색 픽셀이 가장 긴 구간 탐색
+    -- [조건 2] 세로(폭) 방향으로 연속된 파란색 픽셀이 가장 긴 구간 탐색[cite: 2]
     local max_run_h = 0
     local best_y1, best_y2 = 1, height
     for x = 1, width do
@@ -79,10 +86,10 @@ local function get_sign_block_grid(source_img_data, block_size, threshold_ratio)
         end
     end
 
-    -- 연속된 픽셀의 크기가 너무 작으면 노이즈로 판단하여 무시
+    -- 연속된 픽셀의 크기가 너무 작으면 노이즈로 판단하여 무시[cite: 2]
     if max_run_w < 20 or max_run_h < 20 then return nil, "Continuous area too small" end
 
-    -- [조건 3] 표지판이 정사각형/원형이므로, 두 연속 구간 중 최대 길이를 기준으로 정사각형 영역 확정
+    -- [조건 3] 표지판이 정사각형/원형이므로, 두 연속 구간 중 최대 길이를 기준으로 정사각형 영역 확정[cite: 2]
     local max_side = math.max(max_run_w, max_run_h)
     local center_x = (best_x1 + best_x2) / 2
     local center_y = (best_y1 + best_y2) / 2
@@ -92,13 +99,13 @@ local function get_sign_block_grid(source_img_data, block_size, threshold_ratio)
     local min_y = math.floor(center_y - max_side / 2)
     local max_y = min_y + max_side - 1
 
-    -- 이미지 경계 클리핑
+    -- 이미지 경계 클리핑[cite: 2]
     min_x = math.max(1, min_x)
     min_y = math.max(1, min_y)
     max_x = math.min(width, max_x)
     max_y = math.min(height, max_y)
 
-    -- 블록 그리드 생성
+    -- 블록 그리드 생성[cite: 2]
     block_size = block_size or 10
     threshold_ratio = threshold_ratio or 0.15
 
@@ -136,7 +143,7 @@ local function get_sign_block_grid(source_img_data, block_size, threshold_ratio)
     return small_grid
 end
 
--- 2. 방향 판정 로직 (중앙 기준 좌우 파란 픽셀 수 비교)
+-- 2. 방향 판정 로직 (중앙 기준 좌우 파란 픽셀 수 비교)[cite: 2]
 local function get_direction(grid)
     if not grid or #grid == 0 then return "unknown" end
 
@@ -168,7 +175,7 @@ local function get_direction(grid)
     end
 end
 
--- 3. 콘솔 그리드 출력 함수 (디버깅용)
+-- 3. 콘솔 그리드 출력 함수 (디버깅용)[cite: 2]
 local function print_grid(grid)
     if not grid then return end
     print(string.format("--- Grid Dimensions: %d rows x %d cols ---", #grid, #grid[1]))
@@ -185,20 +192,20 @@ end
 -- IP 카메라 연동 및 실시간 반복 실행 영역
 -- =====================================================================
 local timer = 0
-local interval = 0.25 -- 0.25초마다 이미지 갱신 및 방향 분석
+local interval = 0.25 -- 0.25초마다 이미지 갱신 및 방향 분석[cite: 2]
 
 function love.update(dt)
     timer = timer + dt
     if timer >= interval then
         timer = 0
-        
+       
         local success, img_data = pcall(love.image.newImageData, "current.jpg")
-        
+       
         if success and img_data then
-            local grid = get_sign_block_grid(img_data, 1)
-            
+            local grid = get_sign_block_grid(img_data, 10)
+           
             if grid then
-                --print_grid(grid) -- 디버깅 필요시 주석 해제
+                print_grid(grid) -- 디버깅 필요시 주석 해제[cite: 2]
                 local direction = get_direction(grid)
                 print(direction)
             end
