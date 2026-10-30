@@ -1,0 +1,17 @@
+__pycache__/
+*.zip
+
+merged_arrow/
+runs/
+hamsterAdmin-main/
+hamssterboy.py
+hamssterboy2.py
+hamssterboy3.py
+hamsstergymEnv.py
+hamsstergymTra.py
+cameraTest.py
+trainArrow.py
+arrow_dataset/
+arrowVision.py
+lua_run/
+Claude outputs/
