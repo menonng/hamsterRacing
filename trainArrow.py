@@ -3,7 +3,7 @@ from ultralytics import YOLO
 model = YOLO("yolov8n.pt")
 
 model.train(
-    data="merged_arrow/data.yaml",
+    data="arrow_dataset/data.yaml",
     epochs=100,
     imgsz=640,
     batch=16,

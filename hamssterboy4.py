@@ -2,7 +2,7 @@
 from roboid import *
 import random
 import time
-from arrowVision import start, get_direction
+from activeLua import start, get_direction
 
 ham = Hamster()
 
@@ -34,12 +34,12 @@ while True:
     if (left_sensor > distance or right_sensor > distance) and sign == "left":
         block_time = 0
         ham.wheels(-turnsp * 0.6, turnsp)
-        print(f'sign-jwa | {left_sensor} | {right_sensor}')
+        #print(f'sign-jwa | {left_sensor} | {right_sensor}')
 
     elif (left_sensor > distance or right_sensor > distance) and sign == "right":
         block_time = 0
         ham.wheels(turnsp, -turnsp * 0.6)
-        print(f'sign-uuu | {left_sensor} | {right_sensor}')
+        #print(f'sign-uuu | {left_sensor} | {right_sensor}')
 
     elif left_sensor > distance and right_sensor > distance:
         if block_time == 0:
@@ -59,13 +59,13 @@ while True:
             ham.wheels(-turnsp, -turnsp)
             time.sleep(0.5)
             block_time = time.time()
-            print(f'dui | {left_sensor} | {right_sensor}')
+            #print(f'dui | {left_sensor} | {right_sensor}')
         elif direction == 0:
             ham.wheels(-turnsp * 0.6, turnsp)
-            print(f'jwa | {left_sensor} | {right_sensor}')
+            #print(f'jwa | {left_sensor} | {right_sensor}')
         else:
             ham.wheels(turnsp, -turnsp * 0.6)
-            print(f'uuu | {left_sensor} | {right_sensor}')
+            #print(f'uuu | {left_sensor} | {right_sensor}')
 
     elif left_sensor > distance:
         block_time = 0
@@ -74,7 +74,7 @@ while True:
         if speed < -turnsp:
             speed = -turnsp
         ham.wheels(basesp, speed)
-        print(f'uuu | {left_sensor} | {right_sensor}')
+        #print(f'uuu | {left_sensor} | {right_sensor}')
 
     elif right_sensor > distance:
         block_time = 0
@@ -83,11 +83,11 @@ while True:
         if speed < -turnsp:
             speed = -turnsp
         ham.wheels(speed, basesp)
-        print(f'jwa | {left_sensor} | {right_sensor}')
+        #print(f'jwa | {left_sensor} | {right_sensor}')
 
     else:
         block_time = 0
         ham.wheels(basesp, basesp)
-        print(f'apb | {left_sensor} | {right_sensor}')
+        #print(f'apb | {left_sensor} | {right_sensor}')
 
     wait(20)

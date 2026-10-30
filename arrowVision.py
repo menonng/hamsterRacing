@@ -2,9 +2,9 @@ import threading
 import cv2
 from ultralytics import YOLO
 
-stream_url = "MJPEG주소다_애송이"
-weights = "arrow-model/model_release/arrowBest.pt"
-conf=0.5
+stream_url = "http://192.168.66.1:9527/videostream.cgi?loginuse=admin&loginpas=admin"
+weights = "runs\detect/arrow_yolov8n-3/weights/best.pt"
+conf=0.05
 
 direction = None
 lock = threading.Lock()

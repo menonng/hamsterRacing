@@ -11,3 +11,6 @@ hamsstergymEnv.py
 hamsstergymTra.py
 cameraTest.py
 trainArrow.py
+arrow_dataset/
+arrowVision.py
+lua_run/
